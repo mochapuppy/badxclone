@@ -1,4 +1,234 @@
 <!DOCTYPE html>
-<html>
-	<body>Hello world</body>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://kit.fontawesome.com/783da97cd3.js" crossorigin="anonymous"></script>
+    <title>CS-3743 Project</title>
+</head>
+<body>
+    <div id="app">
+        <div id="header">
+            <div class="left"></div>
+            <div class="center">
+                <div id="search-bar">
+                    <i id="search-icon" class="fa-solid fa-magnifying-glass"></i>
+                    <input type="text" id="search" placeholder="Search for anything...">
+                </div>
+            </div>
+            <div class="right">
+                <div id="login-btn">
+                    <i id="login-icon" class="fa-solid fa-user"></i>
+                    Login
+                </div>
+            </div>
+        </div>
+        <div id="main">
+            <div class="left"></div>
+            <div class="center">
+                <div class="post">
+                    <div class="post-header">
+                        <img class="profile-picture" src="assets/profile_picture1.jpg" alt="Profile Picture">
+                        <div class="post-details">
+                            <div class="username">
+                                sodaseal
+                            </div>
+                            <div class="timestamp">
+                                2:11 pm
+                            </div>
+                        </div>
+                    </div>
+                    <div class="post-content">
+                        <div class="text">
+                            just made this new social media platform! i think it's super neat, but what do y'all think?
+                        </div>
+                        <div class="image">
+                            <img src="assets/img1.jpg">
+                        </div>
+                    </div>
+                    <div class="post-footer">
+                        <div class="like-btn">
+                            <i class="like-icon fa-regular fa-heart"></i>
+                            <div class="likes">0</div>
+                        </div>
+                        <div class="comment-btn">
+                            <i class="comment-icon fa-regular fa-comment"></i>
+                            <div class="comments">7</div>
+                        </div>
+                        <div class="share-btn">
+                            <i class="share-icon fa-regular fa-share-from-square"></i>
+                            <div class="shares">2</div>
+                        </div>
+                    </div>
+                    <div class="highlighted-reply">
+                        <div class="reply-bar"></div>
+                        <div class="comment">
+                            <div class="comment-header">
+                                <img class="profile-picture" src="assets/profile_picture2.jpg" alt="Profile Picture">
+                                <div class="comment-details">
+                                    <div class="username">
+                                        i_hate_sodaseal
+                                    </div>
+                                    <div class="timestamp">
+                                        4:17 pm
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="comment-content">
+                                <div class="text">u suck lol. make better placeholders. <span style="color: #427ef5;"> #ratio</span><br><br>(p.s. clean ur room lol)</div>
+                            </div>
+                            <div class="comment-footer">
+                                <div class="like-btn">
+                                    <i class="like-icon fa-regular fa-heart"></i>
+                                    <div class="likes">99</div>
+                                </div>
+                                <div class="comment-btn">
+                                    <i class="comment-icon fa-regular fa-comment"></i>
+                                    <div class="comments">0</div>
+                                </div>
+                                <div class="share-btn">
+                                    <i class="share-icon fa-regular fa-share-from-square"></i>
+                                    <div class="shares">0</div>
+                                </div>
+                            </div>
+                            <div class="highlighted-comment-reply"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="post">
+                    <div class="post-header">
+                        <img class="profile-picture" src="assets/profile_picture1.jpg" alt="Profile Picture">
+                        <div class="post-details">
+                            <div class="username">
+                                sodaseal
+                            </div>
+                            <div class="timestamp">
+                                11:06 am
+                            </div>
+                        </div>
+                    </div>
+                    <div class="post-content">
+                        <div class="text">The wheels on the placeholder go round and round...<br><br>Round and round...<br><br>Round and round...<br><br>The wheels on the placeholder go round and round...</div>
+                    </div>
+                    <div class="post-footer">
+                        <div class="like-btn">
+                            <i class="like-icon fa-regular fa-heart"></i>
+                            <div class="likes">76</div>
+                        </div>
+                        <div class="comment-btn">
+                            <i class="comment-icon fa-regular fa-comment"></i>
+                            <div class="comments">23</div>
+                        </div>
+                        <div class="share-btn">
+                            <i class="share-icon fa-regular fa-share-from-square"></i>
+                            <div class="shares">3</div>
+                        </div>
+                    </div>
+                    <div class="highlighted-reply">
+                        <div class="reply-bar"></div>
+                        <div class="comment">
+                            <div class="comment-header">
+                                <img class="profile-picture" src="assets/profile_picture3.png" alt="Profile Picture">
+                                <div class="comment-details">
+                                    <div class="username">
+                                        MiloTheMilo
+                                    </div>
+                                    <div class="timestamp">
+                                        3:21 pm
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="comment-content">
+                                <div class="text">Alll through the town :D</div>
+                            </div>
+                            <div class="comment-footer">
+                                <div class="like-btn">
+                                    <i class="like-icon fa-regular fa-heart"></i>
+                                    <div class="likes">2</div>
+                                </div>
+                                <div class="comment-btn">
+                                    <i class="comment-icon fa-regular fa-comment"></i>
+                                    <div class="comments">2</div>
+                                </div>
+                                <div class="share-btn">
+                                    <i class="share-icon fa-regular fa-share-from-square"></i>
+                                    <div class="shares">3</div>
+                                </div>
+                            </div>
+                            <div class="highlighted-comment-reply"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="post">
+                    <div class="post-header">
+                        <img class="profile-picture" src="assets/profile_picture1.jpg" alt="Profile Picture">
+                        <div class="post-details">
+                            <div class="username">
+                                sodaseal
+                            </div>
+                            <div class="timestamp">
+                                9:05 am
+                            </div>
+                        </div>
+                    </div>
+                    <div class="post-content">
+                        <div class="text">
+                            i just drank my 4th energy drink today!!! i'm so quirky and random xD can't wait to code more today, too :PPP. I'm bored so y'all tell me something u love a lot hehe
+                        </div>
+                    </div>
+                    <div class="post-footer">
+                        <div class="like-btn">
+                            <i class="like-icon fa-regular fa-heart"></i>
+                            <div class="likes">3</div>
+                        </div>
+                        <div class="comment-btn">
+                            <i class="comment-icon fa-regular fa-comment"></i>
+                            <div class="comments">19</div>
+                        </div>
+                        <div class="share-btn">
+                            <i class="share-icon fa-regular fa-share-from-square"></i>
+                            <div class="shares">7</div>
+                        </div>
+                    </div>
+                    <div class="highlighted-reply">
+                        <div class="reply-bar"></div>
+                        <div class="comment">
+                            <div class="comment-header">
+                                <img class="profile-picture" src="assets/profile_picture4.png" alt="Profile Picture">
+                                <div class="comment-details">
+                                    <div class="username">
+                                        otheruser123
+                                    </div>
+                                    <div class="timestamp">
+                                        10:15 am
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="comment-content">
+                                <div class="text">hello this is a reply :)<br><br>man, i love hardcoding comments</div>
+                            </div>
+                            <div class="comment-footer">
+                                <div class="like-btn">
+                                    <i class="like-icon fa-regular fa-heart"></i>
+                                    <div class="likes">15</div>
+                                </div>
+                                <div class="comment-btn">
+                                    <i class="comment-icon fa-regular fa-comment"></i>
+                                    <div class="comments">3</div>
+                                </div>
+                                <div class="share-btn">
+                                    <i class="share-icon fa-regular fa-share-from-square"></i>
+                                    <div class="shares">5</div>
+                                </div>
+                            </div>
+                            <div class="highlighted-comment-reply"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="right"></div>
+        </div>
+    </div>
+    <script src="main.js"></script>
+</body>
 </html>
