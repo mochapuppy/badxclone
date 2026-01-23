@@ -303,6 +303,8 @@ textarea {
 }
 
 #logo {
+    opacity: 1;
+    transition: opacity 0.07s ease-in-out;
     white-space: nowrap;
 }
 
@@ -310,7 +312,13 @@ textarea {
     margin-right: 0.5rem;
 }
 
-@media (min-width: 701px) and (max-width: 800px) {
+@media (min-width: 825px) and (max-width: 910px) {
+    #logo {
+        opacity: 0;
+    }
+}
+
+@media (min-width: 701px) and (max-width: 824px) {
     #logo {
         display: none;
     }
