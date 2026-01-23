@@ -217,6 +217,13 @@
     margin: 0 0.5rem 0 0;
 }
 
+.like-icon, .comment-icon, .share-icon {
+    transition:
+            transform 0.15s ease,
+            color 0.15s ease,
+            opacity 0.15s ease;
+}
+
 .comment-btn:hover, .like-btn:hover, .share-btn:hover, .attachment-btn:hover, #login-btn:hover, #post-btn:hover {
     background-color: #444;
     cursor: pointer;
