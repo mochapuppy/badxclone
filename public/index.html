@@ -14,23 +14,36 @@
 <body>
     <div id="app">
         <div id="header">
-            <div class="left"></div>
-            <div class="center">
-                <div id="search-bar">
-                    <i id="search-icon" class="fa-solid fa-magnifying-glass"></i>
-                    <input type="text" id="search" placeholder="Search for anything...">
+            <div class="header-left">
+                <div id="logo">
+                    <i id="logo-icon" class="fa-solid fa-database"></i>
+                    BadXClone
                 </div>
             </div>
-            <div class="right">
-                <div id="login-btn">
-                    <i id="login-icon" class="fa-solid fa-user"></i>
-                    Login
+            <div class="header-center">
+                <div class="search-wrapper">
+                    <div id="search-bar">
+                        <i id="search-icon" class="fa-solid fa-magnifying-glass"></i>
+                        <input type="text" id="search" placeholder="Search for anything...">
+                    </div>
+                </div>
+            </div>
+            <div class="header-right">
+                <div class="header-right-button-wrapper">
+                    <div id="post-btn">
+                        <i id="post-icon" class="fa-solid fa-pen-to-square"></i>
+                        Post
+                    </div>
+                    <div id="login-btn">
+                        <i id="login-icon" class="fa-solid fa-user"></i>
+                        Login
+                    </div>
                 </div>
             </div>
         </div>
         <div id="main">
-            <div class="left"></div>
-            <div class="center">
+            <div class="content-left"></div>
+            <div class="content-center">
                 <div class="post">
                     <div class="post-header">
                         <img class="profile-picture" src="assets/images/profile_picture1.jpg" alt="Profile Picture">
@@ -231,7 +244,7 @@
                     </div>
                 </div>
             </div>
-            <div class="right"></div>
+            <div class="content-right"></div>
         </div>
     </div>
     <script src="/js/main.js"></script>
