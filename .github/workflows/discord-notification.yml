@@ -5,7 +5,6 @@ on:
     branches:
       - main
       - production
-      - develop
 
 jobs:
   notify:
@@ -35,8 +34,14 @@ jobs:
             exit 0
           fi
           
-          # Determine status color (green for success)
-          COLOR=3066993
+          # Determine embed color based on branch
+          if [ "${{ github.ref_name }}" = "main" ]; then
+            COLOR=3066993   # Green
+          elif [ "${{ github.ref_name }}" = "production" ]; then
+            COLOR=15158332  # Red
+          else
+            COLOR=9807270   # Gray fallback (optional)
+          fi
           
           # Get changed files count
           CHANGED_FILES=$(git diff --name-only HEAD^ HEAD | wc -l)
