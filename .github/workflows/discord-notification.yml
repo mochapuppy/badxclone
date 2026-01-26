@@ -88,7 +88,15 @@ jobs:
               }]
             }' > payload.json
           
-          # Send to Discord
-          curl -H "Content-Type: application/json" \
+          # Send to Discord with error handling
+          HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" \
+               -H "Content-Type: application/json" \
                -d @payload.json \
-               "$DISCORD_WEBHOOK"
+               "$DISCORD_WEBHOOK")
+          
+          if [ "$HTTP_CODE" -ge 200 ] && [ "$HTTP_CODE" -lt 300 ]; then
+            echo "✓ Discord notification sent successfully (HTTP $HTTP_CODE)"
+          else
+            echo "✗ Failed to send Discord notification (HTTP $HTTP_CODE)"
+            exit 1
+          fi

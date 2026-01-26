@@ -16,7 +16,7 @@ This repository is configured to send Discord notifications when you push featur
 
 ### Step 2: Add Webhook to GitHub Secrets
 
-1. Go to your GitHub repository: https://github.com/mochapuppy/badxclone
+1. Go to your GitHub repository (Settings page)
 2. Click on **Settings** tab
 3. In the left sidebar, click **Secrets and variables** → **Actions**
 4. Click **New repository secret**
