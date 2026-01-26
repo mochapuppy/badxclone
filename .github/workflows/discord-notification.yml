@@ -1,0 +1,87 @@
+name: Discord Notification
+
+on:
+  push:
+    branches:
+      - main
+      - production
+      - develop
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 2
+
+      - name: Get commit information
+        id: commit_info
+        run: |
+          echo "author=$(git log -1 --pretty=format:'%an')" >> $GITHUB_OUTPUT
+          echo "message=$(git log -1 --pretty=format:'%s')" >> $GITHUB_OUTPUT
+          echo "sha_short=$(git log -1 --pretty=format:'%h')" >> $GITHUB_OUTPUT
+          echo "url=${{ github.event.head_commit.url }}" >> $GITHUB_OUTPUT
+
+      - name: Send Discord notification
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK_URL }}
+        run: |
+          if [ -z "$DISCORD_WEBHOOK" ]; then
+            echo "Warning: DISCORD_WEBHOOK_URL secret is not set. Skipping notification."
+            exit 0
+          fi
+          
+          # Determine status color (green for success)
+          COLOR=3066993
+          
+          # Get changed files count
+          CHANGED_FILES=$(git diff --name-only HEAD^ HEAD | wc -l)
+          
+          # Build commit message with proper escaping
+          COMMIT_MESSAGE=$(echo "${{ steps.commit_info.outputs.message }}" | sed 's/"/\\"/g' | sed "s/'/\\'/g")
+          
+          # Create JSON payload
+          cat > payload.json <<EOF
+          {
+            "embeds": [{
+              "title": "New Push to ${{ github.ref_name }}",
+              "description": "${COMMIT_MESSAGE}",
+              "color": ${COLOR},
+              "fields": [
+                {
+                  "name": "Repository",
+                  "value": "[${{ github.repository }}](https://github.com/${{ github.repository }})",
+                  "inline": true
+                },
+                {
+                  "name": "Branch",
+                  "value": "\`${{ github.ref_name }}\`",
+                  "inline": true
+                },
+                {
+                  "name": "Author",
+                  "value": "${{ steps.commit_info.outputs.author }}",
+                  "inline": true
+                },
+                {
+                  "name": "Commit",
+                  "value": "[\`${{ steps.commit_info.outputs.sha_short }}\`](${{ github.event.head_commit.url }})",
+                  "inline": true
+                },
+                {
+                  "name": "Files Changed",
+                  "value": "${CHANGED_FILES}",
+                  "inline": true
+                }
+              ],
+              "timestamp": "$(date -u +%Y-%m-%dT%H:%M:%S.000Z)"
+            }]
+          }
+          EOF
+          
+          # Send to Discord
+          curl -H "Content-Type: application/json" \
+               -d @payload.json \
+               "$DISCORD_WEBHOOK"
