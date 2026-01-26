@@ -289,7 +289,7 @@ textarea {
 
 .reply-text-input {
     color: #ddd;
-    font-size: 0.9rem;
+    font-size: 1rem;
     font-family: Inter, sans-serif;
 }
 
@@ -299,6 +299,7 @@ textarea {
 
 .post-btn {
     background-color: #226ebf;
+    margin-right: 8px;
 }
 
 .post-btn:hover {
