@@ -1,8 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
 
 html, body {
-    padding-top: env(safe-area-inset-top);
-    padding-bottom: env(safe-area-inset-bottom);
     -webkit-text-size-adjust: 100%;
     text-size-adjust: 100%;
     height: 100%;
@@ -22,6 +20,7 @@ html, body {
     width: 100%;
     height: 100%;
     overflow-x: hidden;
+    padding-bottom: env(safe-area-inset-bottom);
     background-color: #111;
     flex-direction: column;
     display: flex;
@@ -294,6 +293,7 @@ textarea {
 .reply-text-input {
     color: #ddd;
     font-size: 1rem;
+    line-height: 1.5;
     font-family: Inter, sans-serif;
 }
 
