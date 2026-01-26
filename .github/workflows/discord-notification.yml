@@ -39,47 +39,54 @@ jobs:
           # Get changed files count
           CHANGED_FILES=$(git diff --name-only HEAD^ HEAD | wc -l)
           
-          # Build commit message with proper escaping
-          COMMIT_MESSAGE=$(echo "${{ steps.commit_info.outputs.message }}" | sed 's/"/\\"/g' | sed "s/'/\\'/g")
-          
-          # Create JSON payload
-          cat > payload.json <<EOF
-          {
-            "embeds": [{
-              "title": "New Push to ${{ github.ref_name }}",
-              "description": "${COMMIT_MESSAGE}",
-              "color": ${COLOR},
-              "fields": [
-                {
-                  "name": "Repository",
-                  "value": "[${{ github.repository }}](https://github.com/${{ github.repository }})",
-                  "inline": true
-                },
-                {
-                  "name": "Branch",
-                  "value": "\`${{ github.ref_name }}\`",
-                  "inline": true
-                },
-                {
-                  "name": "Author",
-                  "value": "${{ steps.commit_info.outputs.author }}",
-                  "inline": true
-                },
-                {
-                  "name": "Commit",
-                  "value": "[\`${{ steps.commit_info.outputs.sha_short }}\`](${{ github.event.head_commit.url }})",
-                  "inline": true
-                },
-                {
-                  "name": "Files Changed",
-                  "value": "${CHANGED_FILES}",
-                  "inline": true
-                }
-              ],
-              "timestamp": "$(date -u +%Y-%m-%dT%H:%M:%S.000Z)"
-            }]
-          }
-          EOF
+          # Create JSON payload using jq for proper escaping
+          jq -n \
+            --arg title "New Push to ${{ github.ref_name }}" \
+            --arg description "${{ steps.commit_info.outputs.message }}" \
+            --argjson color "$COLOR" \
+            --arg repo "${{ github.repository }}" \
+            --arg repo_url "https://github.com/${{ github.repository }}" \
+            --arg branch "${{ github.ref_name }}" \
+            --arg author "${{ steps.commit_info.outputs.author }}" \
+            --arg sha "${{ steps.commit_info.outputs.sha_short }}" \
+            --arg commit_url "${{ github.event.head_commit.url }}" \
+            --arg files "$CHANGED_FILES" \
+            --arg timestamp "$(date -u +%Y-%m-%dT%H:%M:%S.000Z)" \
+            '{
+              embeds: [{
+                title: $title,
+                description: $description,
+                color: $color,
+                fields: [
+                  {
+                    name: "Repository",
+                    value: "[\($repo)](\($repo_url))",
+                    inline: true
+                  },
+                  {
+                    name: "Branch",
+                    value: "`\($branch)`",
+                    inline: true
+                  },
+                  {
+                    name: "Author",
+                    value: $author,
+                    inline: true
+                  },
+                  {
+                    name: "Commit",
+                    value: "[`\($sha)`](\($commit_url))",
+                    inline: true
+                  },
+                  {
+                    name: "Files Changed",
+                    value: $files,
+                    inline: true
+                  }
+                ],
+                timestamp: $timestamp
+              }]
+            }' > payload.json
           
           # Send to Discord
           curl -H "Content-Type: application/json" \
