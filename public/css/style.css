@@ -224,6 +224,7 @@ html, body {
 
 #login-btn, #post-btn, #logo {
     font-size: 1.1rem;
+    text-decoration: none;
 }
 
 .shares, .likes, .comments {
@@ -337,7 +338,7 @@ textarea {
 }
 
 @media (max-width: 900px) {
-    #header {
+    #main-page #header {
         min-height: 88px;
         display: grid;
         grid-template-columns: 1fr 1fr;
@@ -345,20 +346,20 @@ textarea {
         row-gap: 0.4rem;
     }
 
-    .header-left {
+    #main-page .header-left {
         padding: 0.5rem 0.5rem 0 0.5rem;
         grid-column: 1 / 2;
         grid-row: 1;
     }
 
-    .header-right {
+    #main-page .header-right {
         padding: 0.5rem 0.5rem 0 0.5rem;
         grid-column: 2 / 3;
         grid-row: 1;
         justify-content: flex-end;
     }
 
-    .header-center {
+    #main-page .header-center {
         grid-column: 1 / -1;
         grid-row: 2;
         width: 100%;
@@ -366,11 +367,11 @@ textarea {
         margin: 0 auto;
     }
 
-    #search-bar {
+    #main-page #search-bar {
         margin: 0 0.5rem;
     }
 
-    .search-wrapper {
+    #main-page .search-wrapper {
         padding-top: 0;
     }
 }
