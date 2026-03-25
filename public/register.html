@@ -29,10 +29,83 @@
             <div class="content-left"></div>
             <div class="content-center" id="register-center">
                 <div id="register">
+                    <div class="auth-header">
+                        <i class="fa-solid fa-database auth-logo-icon"></i>
+                        <div class="auth-title">Join BadXClone</div>
+                        <div class="auth-subtitle">Create your account</div>
+                    </div>
+                    <div class="auth-content">
+                        <div class="auth-field">
+                            <i class="fa-solid fa-user field-icon"></i>
+                            <input type="text" class="text-input" id="reg-username" placeholder="Username">
+                        </div>
+                        <div class="auth-field">
+                            <i class="fa-solid fa-at field-icon"></i>
+                            <input type="email" class="text-input" id="reg-email" placeholder="Email address">
+                        </div>
+                        <div class="auth-field">
+                            <i class="fa-solid fa-lock field-icon"></i>
+                            <input type="password" class="text-input" id="reg-password" placeholder="Password">
+                            <i class="fa-regular fa-eye toggle-password" id="toggle-reg-password"></i>
+                        </div>
+                        <div class="auth-field" id="confirm-field">
+                            <i class="fa-solid fa-lock field-icon"></i>
+                            <input type="password" class="text-input" id="reg-confirm" placeholder="Confirm password">
+                            <i class="fa-regular fa-eye toggle-password" id="toggle-reg-confirm"></i>
+                        </div>
+                        <div class="password-match-msg" id="match-msg"></div>
+                    </div>
+                    <div class="auth-footer">
+                        <div class="auth-btn-row">
+                            <a href="/login.html" class="auth-secondary-btn">Sign in instead</a>
+                            <button class="auth-primary-btn" type="button" id="register-submit">
+                                Create account
+                                <i class="fa-solid fa-arrow-right"></i>
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div class="content-right"></div>
         </div>
     </div>
+    <script>
+        function bindToggle(toggleId, inputId) {
+            const btn = document.getElementById(toggleId);
+            const field = document.getElementById(inputId);
+            btn.addEventListener('click', () => {
+                const isHidden = field.type === 'password';
+                field.type = isHidden ? 'text' : 'password';
+                btn.classList.toggle('fa-eye', !isHidden);
+                btn.classList.toggle('fa-eye-slash', isHidden);
+            });
+        }
+        bindToggle('toggle-reg-password', 'reg-password');
+        bindToggle('toggle-reg-confirm', 'reg-confirm');
+
+        const pwField = document.getElementById('reg-password');
+        const confirmField = document.getElementById('reg-confirm');
+        const confirmFieldWrapper = document.getElementById('confirm-field');
+        const matchMsg = document.getElementById('match-msg');
+
+        confirmField.addEventListener('input', () => {
+            if (confirmField.value === '') {
+                matchMsg.textContent = '';
+                confirmFieldWrapper.classList.remove('field-error', 'field-success');
+                return;
+            }
+            if (pwField.value === confirmField.value) {
+                matchMsg.textContent = 'Passwords match';
+                matchMsg.className = 'password-match-msg match-ok';
+                confirmFieldWrapper.classList.remove('field-error');
+                confirmFieldWrapper.classList.add('field-success');
+            } else {
+                matchMsg.textContent = 'Passwords do not match';
+                matchMsg.className = 'password-match-msg match-err';
+                confirmFieldWrapper.classList.remove('field-success');
+                confirmFieldWrapper.classList.add('field-error');
+            }
+        });
+    </script>
 </body>
 </html>
