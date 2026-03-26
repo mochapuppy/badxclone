@@ -1746,3 +1746,12 @@ textarea {
 .post > .post-content {
     padding-bottom: 0.4rem;
 }
+
+/* Remove legacy margin-right from buttons — gap on footer handles spacing now */
+.post-footer .comment-btn,
+.post-footer .like-btn,
+.post-footer .share-btn,
+.comment-footer .comment-like-btn,
+.comment-footer .comment-reply-btn {
+    margin-right: 0;
+}
