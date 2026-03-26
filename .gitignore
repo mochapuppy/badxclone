@@ -1,47 +1,24 @@
-####################################
-# macOS
-####################################
 .DS_Store
-
-####################################
-# IntelliJ / JetBrains
-####################################
 .idea/
 *.iml
 out/
-
-####################################
-# PHP / Server
-####################################
 public/api/
 config/
 vendor/
-.htaccess
+public/.htaccess
+public/assets/images/avatars/
+public/assets/images/banners/
+public/assets/images/posts/
+public/*.php
 composer.lock
-
-####################################
-# Environment / Secrets
-####################################
 .env
 .env.local
 .env.*.local
-
-####################################
-# Logs
-####################################
 *.log
 logs/
-
-####################################
-# Build / Cache (generic)
-####################################
 cache/
 tmp/
 build/
 dist/
-
-####################################
-# Editor / OS junk
-####################################
 Thumbs.db
 .vscode/
