@@ -785,3 +785,29 @@ textarea {
     text-align: center;
     padding: 3rem 1rem;
 }
+
+/* ── Show more comments button ──────────────────────────────── */
+.show-more-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    background-color: #333;
+    padding: 0.4rem 0.5rem;
+    border-radius: 0.5rem;
+    color: #aaa;
+    font-family: Inter, sans-serif;
+    font-size: 0.85rem;
+    cursor: pointer;
+    user-select: none;
+    margin-left: 0.5rem;
+    transition: background-color 0.15s ease;
+}
+
+.show-more-btn:hover {
+    background-color: #444;
+    color: #ddd;
+}
+
+.show-more-btn i {
+    font-size: 0.85rem;
+}
