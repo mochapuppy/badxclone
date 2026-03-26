@@ -90,21 +90,26 @@ function buildPostCard(post) {
         <div class="comment-section"></div>
     `;
 
+    // Render top comment only (no children) on feed
     if (post.top_comment) {
         const section = div.querySelector('.comment-section');
         const hasMore = post.comment_count > 1;
-        renderCommentTree([post.top_comment], section, post.id, 1, hasMore, post.top_comment.id);
+        // Pass the top comment with empty children — children load on "show more"
+        const topWithNoChildren = { ...post.top_comment, children: [] };
+        renderCommentTree([topWithNoChildren], section, post.id, 1, hasMore, post.top_comment.id);
     }
 
     return div;
 }
 
 // ── Render comment tree recursively ──────────────────────────────────────────
+// hasMore / excludeId only used at depth=1 for the "show more" button
 function renderCommentTree(comments, container, postId, depth, hasMore, excludeId) {
     comments.forEach((comment, index) => {
         const isLast       = index === comments.length - 1;
-        const showMoreHere = hasMore && isLast && depth === 1;
-        const row          = buildCommentRow(comment, postId, depth, showMoreHere, excludeId);
+        // Show more/less goes on the last comment at depth 1 only
+        const showMore     = hasMore && isLast && depth === 1;
+        const row          = buildCommentRow(comment, postId, depth, showMore, false, excludeId);
         container.appendChild(row);
 
         if (comment.children && comment.children.length > 0) {
@@ -114,17 +119,26 @@ function renderCommentTree(comments, container, postId, depth, hasMore, excludeI
 }
 
 // ── Build comment row ─────────────────────────────────────────────────────────
-function buildCommentRow(comment, postId, depth, showMore, excludeId) {
-    const avatar      = comment.avatar_path ? `/${comment.avatar_path}` : 'assets/images/profile_picture.jpg';
-    const likeDisplay = comment.like_count > 0 ? comment.like_count : '';
-    const likeMargin  = comment.like_count > 0 ? '' : 'style="margin:0"';
-    const visualDepth = Math.min(depth, MAX_VISUAL_DEPTH);
-    const bars        = '<div class="reply-bar"></div>'.repeat(visualDepth);
+// showMore = show "show more comments" button on this row's footer
+// showLess = show "show less" button on this row's footer
+function buildCommentRow(comment, postId, depth, showMore, showLess, excludeId) {
+    const avatar       = comment.avatar_path ? `/${comment.avatar_path}` : 'assets/images/profile_picture.jpg';
+    const likeDisplay  = comment.like_count  > 0 ? comment.like_count  : '';
+    const replyDisplay = comment.reply_count > 0 ? comment.reply_count : '';
+    const likeMargin   = comment.like_count  > 0 ? '' : 'style="margin:0"';
+    const replyMargin  = comment.reply_count > 0 ? '' : 'style="margin:0"';
+    const visualDepth  = Math.min(depth, MAX_VISUAL_DEPTH);
+    const bars         = '<div class="reply-bar"></div>'.repeat(visualDepth);
 
     const showMoreBtn = showMore
         ? `<div class="show-more-btn" data-post-id="${postId}" data-exclude-id="${excludeId}">
-               <i class="fa-solid fa-ellipsis"></i>
-               Show more comments
+               <i class="fa-solid fa-ellipsis"></i> Show more comments
+           </div>`
+        : '';
+
+    const showLessBtn = showLess
+        ? `<div class="show-less-btn" data-post-id="${postId}">
+               <i class="fa-solid fa-chevron-up"></i> Show less
            </div>`
         : '';
 
@@ -152,9 +166,11 @@ function buildCommentRow(comment, postId, depth, showMore, excludeId) {
                     <div class="likes">${likeDisplay}</div>
                 </div>
                 <div class="comment-btn comment-reply-btn" data-post-id="${postId}" data-comment-id="${comment.id}" data-depth="${depth}">
-                    <i class="comment-icon fa-regular fa-comment" style="margin:0"></i>
+                    <i class="comment-icon fa-regular fa-comment" ${replyMargin}></i>
+                    <div class="comments">${replyDisplay}</div>
                 </div>
                 ${showMoreBtn}
+                ${showLessBtn}
             </div>
         </div>
     `;
@@ -218,19 +234,16 @@ function buildComposeBox(postId, parentId, depth) {
 
 // ── Attach listeners ──────────────────────────────────────────────────────────
 function attachPostListeners() {
-    // Post like buttons
     document.querySelectorAll('.like-btn[data-post-id]:not([data-bound])').forEach(btn => {
         btn.dataset.bound = '1';
         btn.addEventListener('click', () => handlePostLike(btn));
     });
 
-    // Comment like buttons
     document.querySelectorAll('.comment-like-btn:not([data-bound])').forEach(btn => {
         btn.dataset.bound = '1';
         btn.addEventListener('click', () => handleCommentLike(btn));
     });
 
-    // Share buttons
     document.querySelectorAll('.share-btn:not([data-bound])').forEach(btn => {
         btn.dataset.bound = '1';
         let shared = false;
@@ -241,34 +254,33 @@ function attachPostListeners() {
         });
     });
 
-    // Post-level comment button (on post footer)
     document.querySelectorAll('.comment-btn[data-post-id]:not(.comment-reply-btn):not([data-bound])').forEach(btn => {
         btn.dataset.bound = '1';
         btn.addEventListener('click', () => handlePostCommentBtn(btn));
     });
 
-    // Comment reply buttons
     document.querySelectorAll('.comment-reply-btn:not([data-bound])').forEach(btn => {
         btn.dataset.bound = '1';
         btn.addEventListener('click', () => handleCommentReplyBtn(btn));
     });
 
-    // Show more buttons
     document.querySelectorAll('.show-more-btn:not([data-bound])').forEach(btn => {
         btn.dataset.bound = '1';
         btn.addEventListener('click', () => handleShowMore(btn));
     });
+
+    document.querySelectorAll('.show-less-btn:not([data-bound])').forEach(btn => {
+        btn.dataset.bound = '1';
+        btn.addEventListener('click', () => handleShowLess(btn));
+    });
 }
 
-// ── Close all compose boxes everywhere (with icon untoggle) ──────────────────
-// Call this before opening any new compose box so only one is ever open at a time.
+// ── Close all compose boxes globally ─────────────────────────────────────────
 function closeAllComposeBoxes(exceptBox) {
     document.querySelectorAll('.compose-box').forEach(c => {
         if (c === exceptBox) return;
         const post = c.closest('.post');
         if (!post) { c.remove(); return; }
-
-        // Untoggle whichever button opened this compose box
         if (c.dataset.parentId) {
             const opener = post.querySelector(`.comment-reply-btn[data-comment-id="${c.dataset.parentId}"]`);
             if (opener) untoggleIcon(opener);
@@ -280,7 +292,6 @@ function closeAllComposeBoxes(exceptBox) {
     });
 }
 
-// Untoggle — set icon back to fa-regular (closed state) without toggling blindly
 function untoggleIcon(element) {
     const icon = element.firstElementChild;
     if (icon.classList.contains('fa-solid')) {
@@ -290,7 +301,6 @@ function untoggleIcon(element) {
 }
 
 // ── Post comment button ───────────────────────────────────────────────────────
-// Opens compose box directly after post-footer, before any comments.
 function handlePostCommentBtn(btn) {
     if (!currentUser) { window.location.href = '/login.html'; return; }
 
@@ -298,7 +308,6 @@ function handlePostCommentBtn(btn) {
     const postId   = btn.dataset.postId;
     const section  = postCard.querySelector('.comment-section');
 
-    // Toggle: if depth-1 compose box is already open for this post, close it
     const firstChild = section.firstElementChild;
     if (firstChild && firstChild.classList.contains('compose-box')
         && firstChild.dataset.depth === '1'
@@ -308,11 +317,9 @@ function handlePostCommentBtn(btn) {
         return;
     }
 
-    // Close everything else globally
     closeAllComposeBoxes(null);
     toggleIcon(btn);
 
-    // If no comments loaded yet, load them first then insert compose at top
     if (!section.querySelector('.comment-row:not(.compose-box)')) {
         loadCommentsIntoSection(postId, section, btn, true);
     } else {
@@ -323,7 +330,6 @@ function handlePostCommentBtn(btn) {
 }
 
 // ── Comment reply button ──────────────────────────────────────────────────────
-// Opens compose box directly after the comment being replied to.
 function handleCommentReplyBtn(btn) {
     if (!currentUser) { window.location.href = '/login.html'; return; }
 
@@ -332,7 +338,6 @@ function handleCommentReplyBtn(btn) {
     const depth      = parseInt(btn.dataset.depth) + 1;
     const commentRow = btn.closest('.comment-row');
 
-    // Toggle: if this comment's compose box is already open, close it
     const next = commentRow.nextElementSibling;
     if (next && next.classList.contains('compose-box') && next.dataset.parentId === commentId) {
         next.remove();
@@ -340,7 +345,6 @@ function handleCommentReplyBtn(btn) {
         return;
     }
 
-    // Close everything else globally
     closeAllComposeBoxes(null);
     toggleIcon(btn);
 
@@ -349,7 +353,7 @@ function handleCommentReplyBtn(btn) {
     compose.querySelector('.reply-text-input').focus();
 }
 
-// ── Load comments into section ────────────────────────────────────────────────
+// ── Load full comment tree into section ───────────────────────────────────────
 async function loadCommentsIntoSection(postId, section, triggerBtn, insertComposeAtTop) {
     section.innerHTML = '<div class="feed-loading" style="padding:0.75rem 1rem">Loading comments...</div>';
 
@@ -379,34 +383,91 @@ async function handleShowMore(btn) {
     const postId    = btn.dataset.postId;
     const excludeId = btn.dataset.excludeId;
 
-    btn.textContent         = 'Loading...';
-    btn.style.pointerEvents = 'none';
-
-    const res      = await fetch(`/api/get_comments.php?post_id=${postId}&exclude_id=${excludeId}`);
-    const comments = await res.json();
-
+    // Remove the show more button from the top comment's footer
     btn.remove();
-
-    if (!comments.length) return;
 
     const postCard = document.querySelector(`.post[data-id="${postId}"]`);
     const section  = postCard.querySelector('.comment-section');
 
-    // Insert before any open compose box
+    const res      = await fetch(`/api/get_comments.php?post_id=${postId}&exclude_id=${excludeId}`);
+    const comments = await res.json();
+
+    if (!comments.length) {
+        // No more comments — add show less to the last visible comment
+        addShowLessToLastComment(section, postId);
+        return;
+    }
+
+    // Insert remaining comments before any open compose box
     const compose = section.querySelector('.compose-box');
     comments.forEach(comment => {
-        const row = buildCommentRow(comment, postId, 1, false, null);
-        if (compose) {
-            section.insertBefore(row, compose);
-        } else {
-            section.appendChild(row);
-        }
+        const row = buildCommentRow(comment, postId, 1, false, false, null);
+        compose ? section.insertBefore(row, compose) : section.appendChild(row);
         if (comment.children && comment.children.length > 0) {
             renderCommentTree(comment.children, section, postId, 2, false, null);
         }
     });
 
     attachPostListeners();
+
+    // Add "show less" to the footer of the last displayed comment
+    addShowLessToLastComment(section, postId);
+}
+
+// ── Add show less button to last comment in section ───────────────────────────
+function addShowLessToLastComment(section, postId) {
+    // Find last comment-row that's not a compose box
+    const allRows   = [...section.querySelectorAll('.comment-row:not(.compose-box)')];
+    const lastRow   = allRows[allRows.length - 1];
+    if (!lastRow) return;
+
+    const footer = lastRow.querySelector('.comment-footer');
+    if (!footer) return;
+
+    // Don't add if already there
+    if (footer.querySelector('.show-less-btn')) return;
+
+    const btn = document.createElement('div');
+    btn.className        = 'show-less-btn';
+    btn.dataset.postId   = postId;
+    btn.innerHTML        = `<i class="fa-solid fa-chevron-up"></i> Show less`;
+    btn.addEventListener('click', () => handleShowLess(btn));
+    footer.appendChild(btn);
+}
+
+// ── Show less ─────────────────────────────────────────────────────────────────
+function handleShowLess(btn) {
+    const postId   = btn.dataset.postId;
+    const postCard = document.querySelector(`.post[data-id="${postId}"]`);
+    const section  = postCard.querySelector('.comment-section');
+
+    // Close any open compose boxes first
+    closeAllComposeBoxes(null);
+    const commentBtnOpener = postCard.querySelector('.comment-btn[data-post-id]:not(.comment-reply-btn)');
+    if (commentBtnOpener) untoggleIcon(commentBtnOpener);
+
+    // Remember the top comment (first non-compose row)
+    const firstRow = section.querySelector('.comment-row:not(.compose-box)');
+    if (!firstRow) { section.innerHTML = ''; return; }
+
+    const topCommentId = firstRow.dataset.commentId;
+
+    // Remove everything from section
+    section.innerHTML = '';
+
+    // Re-fetch just the top comment from what we already have
+    // (simpler than re-querying: just rebuild from the original top comment data)
+    // We re-fetch to get fresh data
+    fetch(`/api/get_posts.php?page=1`)
+        .then(r => r.json())
+        .then(posts => {
+            const post = posts.find(p => String(p.id) === String(postId));
+            if (!post || !post.top_comment) return;
+            const hasMore = post.comment_count > 1;
+            const topWithNoChildren = { ...post.top_comment, children: [] };
+            renderCommentTree([topWithNoChildren], section, postId, 1, hasMore, post.top_comment.id);
+            attachPostListeners();
+        });
 }
 
 // ── Submit comment ────────────────────────────────────────────────────────────
@@ -436,23 +497,26 @@ async function submitComment(postId, parentId, textarea, composeRow) {
     textarea.value        = '';
     textarea.style.height = 'auto';
 
-    const depth   = parseInt(composeRow.dataset.depth) || 1;
-    const newRow  = buildCommentRow(comment, postId, depth, false, null);
+    const depth    = parseInt(composeRow.dataset.depth) || 1;
+    const newRow   = buildCommentRow(comment, postId, depth, false, false, null);
     const postCard = composeRow.closest('.post');
 
     composeRow.insertAdjacentElement('beforebegin', newRow);
     attachPostListeners();
 
-    // Untoggle whichever button opened this compose box
+    // Untoggle opener and remove compose box
     if (composeRow.dataset.parentId) {
         const opener = postCard.querySelector(`.comment-reply-btn[data-comment-id="${composeRow.dataset.parentId}"]`);
-        if (opener) untoggleIcon(opener);
+        if (opener) {
+            untoggleIcon(opener);
+            // Bump reply count on the parent comment's button
+            increaseCount(opener);
+        }
     } else {
         const opener = postCard.querySelector('.comment-btn[data-post-id]:not(.comment-reply-btn)');
         if (opener) untoggleIcon(opener);
     }
 
-    // Remove the compose box
     composeRow.remove();
 
     // Bump post comment count
@@ -500,7 +564,6 @@ async function handleCommentLike(btn) {
     const count     = btn.querySelector('.likes');
     const wasLiked  = btn.dataset.liked === '1';
 
-    // Optimistic update
     btn.dataset.liked = wasLiked ? '0' : '1';
     icon.classList.toggle('fa-regular', wasLiked);
     icon.classList.toggle('fa-solid',   !wasLiked);

@@ -1077,3 +1077,49 @@ textarea {
 .comment-section > *:last-child .comment-bars .reply-bar:last-of-type {
     border-radius: 0 0 2px 2px !important;
 }
+
+/* ── Comment spacing & show less button ─────────────────────── */
+
+/* More vertical breathing room inside each comment */
+.comment-row {
+    padding-top: 1rem;
+}
+
+.comment-body-wrap .comment-header {
+    padding-bottom: 0.5rem;
+}
+
+.comment-body-wrap .comment-content {
+    padding-bottom: 0.6rem;
+}
+
+.comment-body-wrap .comment-footer {
+    padding-bottom: 0.75rem;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+/* Show less button — matches show more styling */
+.show-less-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    background-color: #333;
+    padding: 0.4rem 0.5rem;
+    border-radius: 0.5rem;
+    color: #aaa;
+    font-family: Inter, sans-serif;
+    font-size: 0.85rem;
+    cursor: pointer;
+    user-select: none;
+    transition: background-color 0.15s ease;
+}
+
+.show-less-btn:hover {
+    background-color: #444;
+    color: #ddd;
+}
+
+.show-less-btn i {
+    font-size: 0.85rem;
+}
