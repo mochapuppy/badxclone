@@ -13,6 +13,8 @@ out/
 ####################################
 # PHP / Server
 ####################################
+public/api/
+config/
 vendor/
 composer.lock
 
