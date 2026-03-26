@@ -1772,3 +1772,13 @@ textarea {
     margin-left: 0;
     order: unset;
 }
+
+/* ── Post footer spacing fix ────────────────────────────────── */
+.post-footer {
+    display: flex;
+    align-items: center;
+    padding: 0.6rem 1rem 0.75rem 1rem;
+    gap: 0.5rem;
+    width: 100%;
+    box-sizing: border-box;
+}
