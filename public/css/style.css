@@ -1047,3 +1047,33 @@ textarea {
 .compose-box .character-count {
     margin-left: auto;  /* pushes to far right regardless of depth */
 }
+
+/* ── Continuous bars fix ────────────────────────────────────── */
+
+/* No top padding gap between consecutive comment rows */
+.comment-section > .comment-row + .comment-row,
+.comment-section > .comment-row + .comment-children,
+.comment-section > .comment-children + .comment-row,
+.comment-section > .comment-children + .comment-children {
+    padding-top: 0;
+}
+
+.comment-children > .comment-row + .comment-row {
+    padding-top: 0;
+}
+
+/* Bars have no border-radius so they connect flush */
+.comment-bars .reply-bar {
+    border-radius: 0 !important;
+}
+
+/* Only the very first bar in the section gets a top radius */
+.comment-section > .comment-row:first-child > .comment-bars > .reply-bar:first-child {
+    border-radius: 2px 2px 0 0 !important;
+}
+
+/* Only the very last bar before the section ends gets a bottom radius */
+.comment-section > *:last-child > .comment-bars > .reply-bar,
+.comment-section > *:last-child .comment-bars .reply-bar:last-of-type {
+    border-radius: 0 0 2px 2px !important;
+}

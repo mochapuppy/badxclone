@@ -1,6 +1,6 @@
 // main.js
 
-const MAX_VISUAL_DEPTH = 4; // bars cap at 4, nesting continues logically
+const MAX_VISUAL_DEPTH = 4;
 
 // ── Auth state ────────────────────────────────────────────────────────────────
 let currentUser = null;
@@ -90,7 +90,6 @@ function buildPostCard(post) {
         <div class="comment-section"></div>
     `;
 
-    // Render top comment tree immediately if one exists
     if (post.top_comment) {
         const section = div.querySelector('.comment-section');
         const hasMore = post.comment_count > 1;
@@ -100,39 +99,25 @@ function buildPostCard(post) {
     return div;
 }
 
-// ── Render a comment tree recursively ─────────────────────────────────────────
-// comments  = array of comment objects (each may have .children)
-// container = DOM element to append into
-// postId    = the parent post id
-// depth     = current depth level (1 = direct reply to post)
-// hasMore   = show "show more" button after last top-level comment
-// excludeId = the comment id to exclude from "show more" fetch
-
-function renderCommentTree(comments, container, postId, depth = 1, hasMore = false, excludeId = null) {
+// ── Render comment tree recursively ──────────────────────────────────────────
+function renderCommentTree(comments, container, postId, depth, hasMore, excludeId) {
     comments.forEach((comment, index) => {
         const isLast       = index === comments.length - 1;
         const showMoreHere = hasMore && isLast && depth === 1;
-
-        const row = buildCommentRow(comment, postId, depth, showMoreHere, excludeId);
+        const row          = buildCommentRow(comment, postId, depth, showMoreHere, excludeId);
         container.appendChild(row);
 
-        // Recursively render children indented one level deeper
         if (comment.children && comment.children.length > 0) {
-            const childContainer = document.createElement('div');
-            childContainer.className = 'comment-children';
-            container.appendChild(childContainer);
-            renderCommentTree(comment.children, childContainer, postId, depth + 1, false, null);
+            renderCommentTree(comment.children, container, postId, depth + 1, false, null);
         }
     });
 }
 
-// ── Build a single comment row ────────────────────────────────────────────────
-function buildCommentRow(comment, postId, depth, showMore = false, excludeId = null) {
+// ── Build comment row ─────────────────────────────────────────────────────────
+function buildCommentRow(comment, postId, depth, showMore, excludeId) {
     const avatar      = comment.avatar_path ? `/${comment.avatar_path}` : 'assets/images/profile_picture.jpg';
     const likeDisplay = comment.like_count > 0 ? comment.like_count : '';
     const likeMargin  = comment.like_count > 0 ? '' : 'style="margin:0"';
-
-    // Visual depth caps at MAX_VISUAL_DEPTH but logical depth keeps going
     const visualDepth = Math.min(depth, MAX_VISUAL_DEPTH);
     const bars        = '<div class="reply-bar"></div>'.repeat(visualDepth);
 
@@ -144,11 +129,11 @@ function buildCommentRow(comment, postId, depth, showMore = false, excludeId = n
         : '';
 
     const row = document.createElement('div');
-    row.className           = 'comment-row';
-    row.dataset.commentId   = comment.id;
-    row.dataset.postId      = postId;
-    row.dataset.depth       = depth;
-    row.innerHTML           = `
+    row.className         = 'comment-row';
+    row.dataset.commentId = comment.id;
+    row.dataset.postId    = postId;
+    row.dataset.depth     = depth;
+    row.innerHTML         = `
         <div class="comment-bars">${bars}</div>
         <div class="comment-body-wrap">
             <div class="comment-header">
@@ -183,11 +168,11 @@ function buildComposeBox(postId, parentId, depth) {
     const bars        = '<div class="reply-bar"></div>'.repeat(visualDepth);
 
     const row = document.createElement('div');
-    row.className            = 'comment-row compose-box';
-    row.dataset.postId       = postId;
-    row.dataset.parentId     = parentId || '';
-    row.dataset.depth        = depth;
-    row.innerHTML            = `
+    row.className        = 'comment-row compose-box';
+    row.dataset.postId   = postId;
+    row.dataset.parentId = parentId || '';
+    row.dataset.depth    = depth;
+    row.innerHTML        = `
         <div class="comment-bars">${bars}</div>
         <div class="comment-body-wrap">
             <div class="reply-draft">
@@ -228,7 +213,6 @@ function buildComposeBox(postId, parentId, depth) {
     });
 
     submitBtn.addEventListener('click', () => submitComment(postId, parentId, textarea, row));
-
     return row;
 }
 
@@ -238,6 +222,12 @@ function attachPostListeners() {
     document.querySelectorAll('.like-btn[data-post-id]:not([data-bound])').forEach(btn => {
         btn.dataset.bound = '1';
         btn.addEventListener('click', () => handlePostLike(btn));
+    });
+
+    // Comment like buttons
+    document.querySelectorAll('.comment-like-btn:not([data-bound])').forEach(btn => {
+        btn.dataset.bound = '1';
+        btn.addEventListener('click', () => handleCommentLike(btn));
     });
 
     // Share buttons
@@ -251,7 +241,7 @@ function attachPostListeners() {
         });
     });
 
-    // Post-level comment buttons (on post footer, not on comments)
+    // Post-level comment button (on post footer)
     document.querySelectorAll('.comment-btn[data-post-id]:not(.comment-reply-btn):not([data-bound])').forEach(btn => {
         btn.dataset.bound = '1';
         btn.addEventListener('click', () => handlePostCommentBtn(btn));
@@ -270,7 +260,37 @@ function attachPostListeners() {
     });
 }
 
+// ── Close all compose boxes everywhere (with icon untoggle) ──────────────────
+// Call this before opening any new compose box so only one is ever open at a time.
+function closeAllComposeBoxes(exceptBox) {
+    document.querySelectorAll('.compose-box').forEach(c => {
+        if (c === exceptBox) return;
+        const post = c.closest('.post');
+        if (!post) { c.remove(); return; }
+
+        // Untoggle whichever button opened this compose box
+        if (c.dataset.parentId) {
+            const opener = post.querySelector(`.comment-reply-btn[data-comment-id="${c.dataset.parentId}"]`);
+            if (opener) untoggleIcon(opener);
+        } else {
+            const opener = post.querySelector('.comment-btn[data-post-id]:not(.comment-reply-btn)');
+            if (opener) untoggleIcon(opener);
+        }
+        c.remove();
+    });
+}
+
+// Untoggle — set icon back to fa-regular (closed state) without toggling blindly
+function untoggleIcon(element) {
+    const icon = element.firstElementChild;
+    if (icon.classList.contains('fa-solid')) {
+        icon.classList.remove('fa-solid');
+        icon.classList.add('fa-regular');
+    }
+}
+
 // ── Post comment button ───────────────────────────────────────────────────────
+// Opens compose box directly after post-footer, before any comments.
 function handlePostCommentBtn(btn) {
     if (!currentUser) { window.location.href = '/login.html'; return; }
 
@@ -278,28 +298,59 @@ function handlePostCommentBtn(btn) {
     const postId   = btn.dataset.postId;
     const section  = postCard.querySelector('.comment-section');
 
-    // Toggle existing depth-1 compose box at the end of the section
-    const existing = section.querySelector('.compose-box[data-depth="1"]');
-    if (existing) {
-        existing.remove();
-        toggleIcon(btn);
+    // Toggle: if depth-1 compose box is already open for this post, close it
+    const firstChild = section.firstElementChild;
+    if (firstChild && firstChild.classList.contains('compose-box')
+        && firstChild.dataset.depth === '1'
+        && !firstChild.dataset.parentId) {
+        firstChild.remove();
+        untoggleIcon(btn);
         return;
     }
 
+    // Close everything else globally
+    closeAllComposeBoxes(null);
     toggleIcon(btn);
 
-    // If no comments loaded yet, load them first then add compose box
-    if (!section.querySelector('.comment-row')) {
-        loadCommentsIntoSection(postId, section, btn);
+    // If no comments loaded yet, load them first then insert compose at top
+    if (!section.querySelector('.comment-row:not(.compose-box)')) {
+        loadCommentsIntoSection(postId, section, btn, true);
     } else {
         const compose = buildComposeBox(postId, null, 1);
-        section.appendChild(compose);
+        section.insertBefore(compose, section.firstChild);
         compose.querySelector('.reply-text-input').focus();
     }
 }
 
-// ── Load full comment tree into a section ─────────────────────────────────────
-async function loadCommentsIntoSection(postId, section, triggerBtn) {
+// ── Comment reply button ──────────────────────────────────────────────────────
+// Opens compose box directly after the comment being replied to.
+function handleCommentReplyBtn(btn) {
+    if (!currentUser) { window.location.href = '/login.html'; return; }
+
+    const postId     = btn.dataset.postId;
+    const commentId  = btn.dataset.commentId;
+    const depth      = parseInt(btn.dataset.depth) + 1;
+    const commentRow = btn.closest('.comment-row');
+
+    // Toggle: if this comment's compose box is already open, close it
+    const next = commentRow.nextElementSibling;
+    if (next && next.classList.contains('compose-box') && next.dataset.parentId === commentId) {
+        next.remove();
+        untoggleIcon(btn);
+        return;
+    }
+
+    // Close everything else globally
+    closeAllComposeBoxes(null);
+    toggleIcon(btn);
+
+    const compose = buildComposeBox(postId, commentId, depth);
+    commentRow.insertAdjacentElement('afterend', compose);
+    compose.querySelector('.reply-text-input').focus();
+}
+
+// ── Load comments into section ────────────────────────────────────────────────
+async function loadCommentsIntoSection(postId, section, triggerBtn, insertComposeAtTop) {
     section.innerHTML = '<div class="feed-loading" style="padding:0.75rem 1rem">Loading comments...</div>';
 
     const res      = await fetch(`/api/get_comments.php?post_id=${postId}`);
@@ -312,51 +363,23 @@ async function loadCommentsIntoSection(postId, section, triggerBtn) {
         attachPostListeners();
     }
 
-    // Add compose box at the end
     if (triggerBtn) {
         const compose = buildComposeBox(postId, null, 1);
-        section.appendChild(compose);
+        if (insertComposeAtTop) {
+            section.insertBefore(compose, section.firstChild);
+        } else {
+            section.appendChild(compose);
+        }
         compose.querySelector('.reply-text-input').focus();
     }
 }
 
-// ── Comment reply button ──────────────────────────────────────────────────────
-function handleCommentReplyBtn(btn) {
-    if (!currentUser) { window.location.href = '/login.html'; return; }
-
-    const postId    = btn.dataset.postId;
-    const commentId = btn.dataset.commentId;
-    const depth     = parseInt(btn.dataset.depth) + 1;
-    const commentRow = btn.closest('.comment-row');
-
-    // Toggle: close if already open for this comment
-    const next = commentRow.nextElementSibling;
-    if (next && next.classList.contains('compose-box') && next.dataset.parentId === commentId) {
-        next.remove();
-        toggleIcon(btn);
-        return;
-    }
-
-    toggleIcon(btn);
-
-    // Close any other open compose boxes within this post first
-    const postCard = commentRow.closest('.post');
-    postCard.querySelectorAll('.compose-box').forEach(c => c.remove());
-
-    // Re-toggle the icon since we just closed everything
-    // (only re-toggle if the btn icon was already set above)
-
-    const compose = buildComposeBox(postId, commentId, depth);
-    commentRow.insertAdjacentElement('afterend', compose);
-    compose.querySelector('.reply-text-input').focus();
-}
-
-// ── Show more ────────────────────────────────────────────────────────────────
+// ── Show more ─────────────────────────────────────────────────────────────────
 async function handleShowMore(btn) {
     const postId    = btn.dataset.postId;
     const excludeId = btn.dataset.excludeId;
 
-    btn.textContent = 'Loading...';
+    btn.textContent         = 'Loading...';
     btn.style.pointerEvents = 'none';
 
     const res      = await fetch(`/api/get_comments.php?post_id=${postId}&exclude_id=${excludeId}`);
@@ -369,7 +392,20 @@ async function handleShowMore(btn) {
     const postCard = document.querySelector(`.post[data-id="${postId}"]`);
     const section  = postCard.querySelector('.comment-section');
 
-    renderCommentTree(comments, section, postId, 1, false, null);
+    // Insert before any open compose box
+    const compose = section.querySelector('.compose-box');
+    comments.forEach(comment => {
+        const row = buildCommentRow(comment, postId, 1, false, null);
+        if (compose) {
+            section.insertBefore(row, compose);
+        } else {
+            section.appendChild(row);
+        }
+        if (comment.children && comment.children.length > 0) {
+            renderCommentTree(comment.children, section, postId, 2, false, null);
+        }
+    });
+
     attachPostListeners();
 }
 
@@ -400,20 +436,31 @@ async function submitComment(postId, parentId, textarea, composeRow) {
     textarea.value        = '';
     textarea.style.height = 'auto';
 
-    const depth  = parseInt(composeRow.dataset.depth) || 1;
-    const newRow = buildCommentRow(comment, postId, depth, false, null);
+    const depth   = parseInt(composeRow.dataset.depth) || 1;
+    const newRow  = buildCommentRow(comment, postId, depth, false, null);
+    const postCard = composeRow.closest('.post');
 
-    // Insert before the compose box
     composeRow.insertAdjacentElement('beforebegin', newRow);
     attachPostListeners();
 
+    // Untoggle whichever button opened this compose box
+    if (composeRow.dataset.parentId) {
+        const opener = postCard.querySelector(`.comment-reply-btn[data-comment-id="${composeRow.dataset.parentId}"]`);
+        if (opener) untoggleIcon(opener);
+    } else {
+        const opener = postCard.querySelector('.comment-btn[data-post-id]:not(.comment-reply-btn)');
+        if (opener) untoggleIcon(opener);
+    }
+
+    // Remove the compose box
+    composeRow.remove();
+
     // Bump post comment count
-    const postCard   = composeRow.closest('.post');
     const commentBtn = postCard.querySelector('.comment-btn[data-post-id]:not(.comment-reply-btn)');
     if (commentBtn) increaseCount(commentBtn);
 }
 
-// ── Post like handler ─────────────────────────────────────────────────────────
+// ── Post like ─────────────────────────────────────────────────────────────────
 async function handlePostLike(btn) {
     if (!currentUser) { window.location.href = '/login.html'; return; }
 
@@ -430,6 +477,38 @@ async function handlePostLike(btn) {
     formData.append('post_id', postId);
 
     const res  = await fetch('/api/toggle_like.php', { method: 'POST', body: formData });
+    if (res.status === 401) { window.location.href = '/login.html'; return; }
+
+    const data = await res.json();
+    if (data.error) {
+        btn.dataset.liked = wasLiked ? '1' : '0';
+        icon.classList.toggle('fa-regular', !wasLiked);
+        icon.classList.toggle('fa-solid',   wasLiked);
+        return;
+    }
+
+    count.textContent = data.like_count > 0 ? data.like_count : '';
+    icon.style.margin = data.like_count > 0 ? '0 0.5rem 0 0' : '0';
+}
+
+// ── Comment like ──────────────────────────────────────────────────────────────
+async function handleCommentLike(btn) {
+    if (!currentUser) { window.location.href = '/login.html'; return; }
+
+    const commentId = btn.dataset.commentId;
+    const icon      = btn.querySelector('.like-icon');
+    const count     = btn.querySelector('.likes');
+    const wasLiked  = btn.dataset.liked === '1';
+
+    // Optimistic update
+    btn.dataset.liked = wasLiked ? '0' : '1';
+    icon.classList.toggle('fa-regular', wasLiked);
+    icon.classList.toggle('fa-solid',   !wasLiked);
+
+    const formData = new FormData();
+    formData.append('comment_id', commentId);
+
+    const res  = await fetch('/api/toggle_comment_like.php', { method: 'POST', body: formData });
     if (res.status === 401) { window.location.href = '/login.html'; return; }
 
     const data = await res.json();
