@@ -35,8 +35,8 @@ and apply my understanding of relational databases to real-world applications (u
 - [ ] Increase functionality via adding redundant buttons in specific places
 - [ ] Clean up inefficient code (e.g. fix animation when collapsing comments)
 - [ ] Fix reply-bar so it properly displays the relation to each parent post/comment
-- [ ] Clean up sub-URLs
-- - [ ] badxclone.com/index.html --> badxclone.com/
-- - [ ] badxclone.com/u/foobar (also /u/user_id, /user/user_id) --> badxclone.com/user/foobar
+- [x] Clean up sub-URLs
+- - [x] badxclone.com/index.html --> badxclone.com/
+- - [x] badxclone.com/u/foobar (also /u/user_id, /user/user_id) --> badxclone.com/user/foobar
 - [ ] Fix navigation bar on user-pages
 - [ ] Fix issues with interactions not being highlighted sometimes
