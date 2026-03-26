@@ -132,7 +132,7 @@ function buildCommentRow(comment, postId, depth, showMore, showLess, excludeId) 
 
     const showMoreBtn = showMore
         ? `<div class="show-more-btn" data-post-id="${postId}" data-exclude-id="${excludeId}">
-               <i class="fa-solid fa-ellipsis"></i> Show more comments
+               <i class="fa-regular fa-comments"></i> Show more
            </div>`
         : '';
 

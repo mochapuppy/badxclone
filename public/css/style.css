@@ -1123,3 +1123,26 @@ textarea {
 .show-less-btn i {
     font-size: 0.85rem;
 }
+
+/* ── Spacing refinements ────────────────────────────────────── */
+
+/* Last comment in section — trim excess footer padding */
+.comment-section > .comment-row:last-child > .comment-body-wrap > .comment-footer,
+.comment-section > .comment-children:last-child > .comment-row:last-child > .comment-body-wrap > .comment-footer {
+    padding-bottom: 0.35rem;
+}
+
+/* Compose box mid-thread — match surrounding comment spacing */
+.comment-row.compose-box {
+    padding-top: 0.75rem;
+}
+
+.compose-box .reply-draft-footer {
+    padding-bottom: 0.75rem;
+}
+
+/* Show more icon size — match comment button icon */
+.show-more-btn i,
+.show-less-btn i {
+    font-size: 0.9rem;
+}
