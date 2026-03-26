@@ -1195,7 +1195,7 @@ textarea {
 
 #profile-banner {
     width: 100%;
-    height: 140px;
+    height: 130px;
     background-color: #2a2a2a;
     background-size: cover;
     background-position: center;
@@ -1494,4 +1494,111 @@ textarea {
     background-color: #3a1a1a;
     color: #bf6a6a;
     border: 1px solid #5a2a2a;
+}
+
+/* ── Delete button ──────────────────────────────────────────── */
+
+.delete-btn {
+    margin-left: auto;
+    background: none;
+    border: none;
+    color: #555;
+    font-size: 0.9rem;
+    padding: 0.3rem 0.4rem;
+    border-radius: 0.4rem;
+    cursor: pointer;
+    transition: color 0.15s ease, background-color 0.15s ease;
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+.delete-btn:hover {
+    color: #bf3322;
+    background-color: rgba(191, 51, 34, 0.1);
+}
+
+/* Post header needs space-between for trash to sit on the right */
+.post-header {
+    display: flex;
+    align-items: center;
+    padding: 1rem 1rem 0 1rem;
+    width: 100%;
+}
+
+.comment-header {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    padding-bottom: 0.4rem;
+}
+
+/* ── Confirmation dialog ────────────────────────────────────── */
+
+#confirm-overlay {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.65);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 200;
+}
+
+#confirm-dialog {
+    background-color: #222;
+    width: 100%;
+    max-width: 380px;
+    border-radius: 0.75rem;
+    margin: 0 1rem;
+    padding: 1.75rem 1.5rem 1.25rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+    filter: drop-shadow(0 0 20px #000);
+}
+
+#confirm-icon {
+    font-size: 2rem;
+    color: #bf3322;
+}
+
+#confirm-message {
+    font-family: Inter, sans-serif;
+    font-size: 1rem;
+    color: #ddd;
+    text-align: center;
+    line-height: 1.5;
+}
+
+#confirm-buttons {
+    display: flex;
+    gap: 0.75rem;
+    margin-top: 0.5rem;
+}
+
+.danger-btn {
+    background-color: #bf3322 !important;
+}
+
+.danger-btn:hover {
+    background-color: #d94433 !important;
+}
+
+/* ── Admin badge ────────────────────────────────────────────── */
+
+.admin-badge {
+    display: inline-block;
+    background-color: #dd5555;
+    color: #fff;
+    font-family: Inter, sans-serif;
+    font-size: 0.7rem;
+    font-weight: 600;
+    padding: 0.15rem 0.5rem;
+    border-radius: 0.35rem;
+    margin-left: 0.5rem;
+    vertical-align: middle;
+    letter-spacing: 0.03em;
+    text-transform: lowercase;
 }

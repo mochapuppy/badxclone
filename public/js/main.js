@@ -1,6 +1,6 @@
 // main.js
 
-const MAX_VISUAL_DEPTH = Infinity;
+const MAX_VISUAL_DEPTH = 4;
 
 // ── Auth state ────────────────────────────────────────────────────────────────
 let currentUser = null;
@@ -9,7 +9,7 @@ async function checkAuth() {
     const res  = await fetch('/api/auth_status.php');
     const data = await res.json();
     if (data.logged_in) {
-        currentUser = data;
+        currentUser = data; // includes is_admin from updated auth_status.php
         const loginBtn = document.getElementById('login-btn');
         if (loginBtn) {
             loginBtn.href      = `/user/${data.username}`;
@@ -58,6 +58,12 @@ function buildPostCard(post) {
     const likeMargin  = post.like_count    > 0 ? '' : 'style="margin:0"';
     const commMargin  = post.comment_count > 0 ? '' : 'style="margin:0"';
 
+    const trashBtn = post.can_delete
+        ? `<div class="delete-btn delete-post-btn" data-post-id="${post.id}">
+               <i class="fa-regular fa-trash-can"></i>
+           </div>`
+        : '';
+
     const div = document.createElement('div');
     div.className  = 'post';
     div.dataset.id = post.id;
@@ -68,6 +74,7 @@ function buildPostCard(post) {
                 <div class="username">${escapeHtml(post.display_name || post.username)}</div>
                 <div class="timestamp">${escapeHtml(post.timestamp_formatted)}</div>
             </div>
+            ${trashBtn}
         </div>
         <div class="post-content">
             <div class="text">${escapeHtml(post.body)}</div>
@@ -142,6 +149,12 @@ function buildCommentRow(comment, postId, depth, showMore, showLess, excludeId) 
            </div>`
         : '';
 
+    const trashBtn = comment.can_delete
+        ? `<div class="delete-btn delete-comment-btn" data-comment-id="${comment.id}">
+               <i class="fa-regular fa-trash-can"></i>
+           </div>`
+        : '';
+
     const row = document.createElement('div');
     row.className         = 'comment-row';
     row.dataset.commentId = comment.id;
@@ -156,6 +169,7 @@ function buildCommentRow(comment, postId, depth, showMore, showLess, excludeId) 
                     <div class="username">${escapeHtml(comment.display_name || comment.username)}</div>
                     <div class="timestamp">${escapeHtml(comment.timestamp_formatted)}</div>
                 </div>
+                ${trashBtn}
             </div>
             <div class="comment-content">
                 <div class="text">${escapeHtml(comment.body)}</div>
@@ -272,6 +286,26 @@ function attachPostListeners() {
     document.querySelectorAll('.show-less-btn:not([data-bound])').forEach(btn => {
         btn.dataset.bound = '1';
         btn.addEventListener('click', () => handleShowLess(btn));
+    });
+
+    // Delete post buttons
+    document.querySelectorAll('.delete-post-btn:not([data-bound])').forEach(btn => {
+        btn.dataset.bound = '1';
+        btn.addEventListener('click', () => {
+            showConfirmDialog('Delete this post? This cannot be undone.', () => {
+                deletePost(btn.dataset.postId, btn.closest('.post'));
+            });
+        });
+    });
+
+    // Delete comment buttons
+    document.querySelectorAll('.delete-comment-btn:not([data-bound])').forEach(btn => {
+        btn.dataset.bound = '1';
+        btn.addEventListener('click', () => {
+            showConfirmDialog('Delete this comment? This cannot be undone.', () => {
+                deleteComment(btn.dataset.commentId, btn.closest('.comment-row'));
+            });
+        });
     });
 }
 
@@ -678,6 +712,74 @@ async function submitPost(overlay) {
     const newCard = buildPostCard(post);
     feed.insertBefore(newCard, feed.firstChild);
     attachPostListeners();
+}
+
+// ── Confirmation dialog ───────────────────────────────────────────────────────
+// Custom dark-themed dialog — much better than window.confirm()
+function showConfirmDialog(message, onConfirm) {
+    const existing = document.getElementById('confirm-overlay');
+    if (existing) existing.remove();
+
+    const overlay     = document.createElement('div');
+    overlay.id        = 'confirm-overlay';
+    overlay.innerHTML = `
+        <div id="confirm-dialog">
+            <div id="confirm-icon"><i class="fa-regular fa-trash-can"></i></div>
+            <div id="confirm-message">${escapeHtml(message)}</div>
+            <div id="confirm-buttons">
+                <button id="confirm-cancel-btn" class="auth-secondary-btn">Cancel</button>
+                <button id="confirm-ok-btn" class="auth-primary-btn danger-btn">
+                    <i class="fa-solid fa-trash-can"></i> Delete
+                </button>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(overlay);
+
+    overlay.addEventListener('click', e => { if (e.target === overlay) overlay.remove(); });
+    document.getElementById('confirm-cancel-btn').addEventListener('click', () => overlay.remove());
+    document.getElementById('confirm-ok-btn').addEventListener('click', () => {
+        overlay.remove();
+        onConfirm();
+    });
+}
+
+// ── Delete post ───────────────────────────────────────────────────────────────
+async function deletePost(postId, postEl) {
+    const formData = new FormData();
+    formData.append('post_id', postId);
+
+    const res  = await fetch('/api/delete_post.php', { method: 'POST', body: formData });
+    const data = await res.json();
+
+    if (data.error) {
+        alert('Could not delete post: ' + data.error);
+        return;
+    }
+
+    // Fade out and remove the post card
+    postEl.style.transition = 'opacity 0.2s ease';
+    postEl.style.opacity    = '0';
+    setTimeout(() => postEl.remove(), 200);
+}
+
+// ── Delete comment ────────────────────────────────────────────────────────────
+async function deleteComment(commentId, commentEl) {
+    const formData = new FormData();
+    formData.append('comment_id', commentId);
+
+    const res  = await fetch('/api/delete_comment.php', { method: 'POST', body: formData });
+    const data = await res.json();
+
+    if (data.error) {
+        alert('Could not delete comment: ' + data.error);
+        return;
+    }
+
+    // Fade out and remove the comment row
+    commentEl.style.transition = 'opacity 0.2s ease';
+    commentEl.style.opacity    = '0';
+    setTimeout(() => commentEl.remove(), 200);
 }
 
 // ── Post button ───────────────────────────────────────────────────────────────
