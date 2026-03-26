@@ -811,3 +811,93 @@ textarea {
 .show-more-btn i {
     font-size: 0.85rem;
 }
+
+/* ── Comment tree layout ────────────────────────────────────── */
+
+.comment-section {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.comment-children {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.comment-row {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    padding: 0.75rem 0 0 1rem;
+}
+
+.comment-row:last-child {
+    padding-bottom: 0.75rem;
+}
+
+.comment-bars {
+    display: flex;
+    flex-direction: row;
+    flex-shrink: 0;
+    gap: 6px;
+    padding-right: 0.75rem;
+}
+
+.comment-bars .reply-bar {
+    width: 4px;
+    align-self: stretch;
+    background-color: #444;
+    border-radius: 0.5rem;
+    flex-shrink: 0;
+    margin: 0;
+}
+
+.comment-body-wrap {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-width: 0;
+}
+
+.comment-body-wrap .comment-header {
+    padding: 0 0 0.4rem 0;
+}
+
+.comment-body-wrap .comment-content {
+    padding: 0 0 0.4rem 0;
+}
+
+.comment-body-wrap .comment-footer {
+    padding: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.comment-reply-btn {
+    padding: 0.3rem 0.45rem;
+}
+
+.compose-box {
+    padding-top: 0.5rem;
+    padding-bottom: 0.75rem;
+}
+
+.compose-box .reply-draft {
+    width: 100%;
+}
+
+.compose-box .reply-draft-header {
+    padding: 0 0 0.5rem 0;
+}
+
+.compose-box .reply-draft-content {
+    padding: 0 0 0.5rem 0;
+}
+
+.compose-box .reply-draft-footer {
+    padding: 0;
+}
