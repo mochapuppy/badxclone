@@ -843,8 +843,14 @@ function formatFileSize(size) {
 
 // ── Init ──────────────────────────────────────────────────────────────────────
 (async () => {
-    await checkAuth();
-    if (document.querySelector('.content-center') && document.getElementById('main-page')) {
+    // On the profile page, profile.js calls checkAuth() itself after this script loads
+    // so we skip the feed init but still set up the post button listener
+    if (document.getElementById('main-page')) {
+        await checkAuth();
         await loadPosts(1);
+    }
+    // On other pages (login, register, settings) just run checkAuth for the header
+    else if (!document.getElementById('profile-page')) {
+        await checkAuth();
     }
 })();

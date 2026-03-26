@@ -1647,3 +1647,39 @@ textarea {
     margin-left: auto;
     order: 99;
 }
+
+/* ── Footer layout fixes ────────────────────────────────────── */
+
+/* Post footer — consistent gap, delete snaps right */
+.post-footer {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem 1rem 1rem 1rem;
+    gap: 0.5rem;
+    width: 100%;
+}
+
+.post-footer .delete-btn {
+    margin-left: auto;
+}
+
+/* Comment footer — same consistent gap */
+.comment-footer {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: nowrap;
+    padding-bottom: 0.75rem;
+    width: 100%;
+}
+
+/* Show more/less sit naturally in flow, delete always last on right */
+.comment-footer .show-more-btn,
+.comment-footer .show-less-btn {
+    margin-left: 0;
+}
+
+.comment-footer .delete-btn {
+    margin-left: auto;
+    order: 99;
+}
