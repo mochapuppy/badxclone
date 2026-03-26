@@ -1146,3 +1146,41 @@ textarea {
 .show-less-btn i {
     font-size: 0.9rem;
 }
+
+/* ── Show more/less right-aligned ───────────────────────────── */
+
+.show-more-btn,
+.show-less-btn {
+    margin-left: auto;
+}
+
+/* ── Bar border radius — round every start and end ──────────── */
+
+/* Remove all radius first, then selectively add back */
+.comment-bars .reply-bar {
+    border-radius: 0 !important;
+}
+
+/* Top cap: first bar in the very first comment-row of any container */
+.comment-section > .comment-row:first-child .comment-bars .reply-bar,
+.comment-children > .comment-row:first-child .comment-bars .reply-bar {
+    border-top-left-radius: 2px !important;
+    border-top-right-radius: 2px !important;
+}
+
+/* Bottom cap: last bar in the very last row of any container,
+   including compose boxes which can be the last element */
+.comment-section > .comment-row:last-child .comment-bars .reply-bar,
+.comment-section > .compose-box:last-child .comment-bars .reply-bar,
+.comment-children > .comment-row:last-child .comment-bars .reply-bar,
+.comment-children > .compose-box:last-child .comment-bars .reply-bar {
+    border-bottom-left-radius: 2px !important;
+    border-bottom-right-radius: 2px !important;
+}
+
+/* Each deeper bar (2nd, 3rd, 4th) starts and ends within its own
+   comment-children group — round both ends of every extra bar
+   since each child group is its own visual tree branch */
+.comment-children .comment-bars .reply-bar:not(:first-child) {
+    border-radius: 2px !important;
+}
