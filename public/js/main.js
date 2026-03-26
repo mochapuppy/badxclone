@@ -12,20 +12,9 @@ async function checkAuth() {
 
     if (data.logged_in) {
         currentUser = data;
-
-        // Show post button, hide login button
-        document.getElementById('post-btn').style.display  = 'flex';
-        document.getElementById('login-btn').style.display = 'none';
-
-        // Show logout button if it exists in your header
-        const logoutBtn = document.getElementById('logout-btn');
-        if (logoutBtn) logoutBtn.style.display = 'flex';
-    } else {
-        currentUser = null;
-
-        // Hide post button, show login button
-        document.getElementById('post-btn').style.display  = 'none';
-        document.getElementById('login-btn').style.display = 'flex';
+        const loginBtn = document.getElementById('login-btn');
+        loginBtn.href        = `/user/${data.username}`;
+        loginBtn.innerHTML   = `<i id="login-icon" class="fa-solid fa-user"></i>${data.username}`;
     }
 }
 
