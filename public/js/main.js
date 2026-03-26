@@ -96,26 +96,6 @@ function buildPostCard(post) {
         </div>
         <div class="comment-section"></div>
     `;
-        <div class="post-content">
-            <div class="text">${escapeHtml(post.body)}</div>
-            ${imageHtml}
-        </div>
-        <div class="post-footer">
-            <div class="like-btn" data-post-id="${post.id}" data-liked="${post.user_liked ? '1' : '0'}">
-                <i class="like-icon ${likeIcon} fa-heart" ${likeMargin}></i>
-                <div class="likes">${likeDisplay}</div>
-            </div>
-            <div class="comment-btn" data-post-id="${post.id}">
-                <i class="comment-icon fa-regular fa-comment" ${commMargin}></i>
-                <div class="comments">${commDisplay}</div>
-            </div>
-            <div class="share-btn">
-                <i class="share-icon fa-regular fa-share-from-square" style="margin:0"></i>
-                <div class="shares"></div>
-            </div>
-        </div>
-        <div class="comment-section"></div>
-    `;
 
     // Render top comment only (no children) on feed
     if (post.top_comment) {
@@ -205,23 +185,6 @@ function buildCommentRow(comment, postId, depth, showMore, showLess, excludeId) 
                 ${showMoreBtn}
                 ${showLessBtn}
                 ${trashBtn}
-            </div>
-        </div>
-    `;
-            <div class="comment-content">
-                <div class="text">${escapeHtml(comment.body)}</div>
-            </div>
-            <div class="comment-footer">
-                <div class="like-btn comment-like-btn" data-comment-id="${comment.id}" data-liked="0">
-                    <i class="like-icon fa-regular fa-heart" ${likeMargin}></i>
-                    <div class="likes">${likeDisplay}</div>
-                </div>
-                <div class="comment-btn comment-reply-btn" data-post-id="${postId}" data-comment-id="${comment.id}" data-depth="${depth}">
-                    <i class="comment-icon fa-regular fa-comment" ${replyMargin}></i>
-                    <div class="comments">${replyDisplay}</div>
-                </div>
-                ${showMoreBtn}
-                ${showLessBtn}
             </div>
         </div>
     `;
