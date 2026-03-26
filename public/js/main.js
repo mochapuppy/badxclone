@@ -74,8 +74,28 @@ function buildPostCard(post) {
                 <div class="username">${escapeHtml(post.display_name || post.username)}</div>
                 <div class="timestamp">${escapeHtml(post.timestamp_formatted)}</div>
             </div>
+        </div>
+        <div class="post-content">
+            <div class="text">${escapeHtml(post.body)}</div>
+            ${imageHtml}
+        </div>
+        <div class="post-footer">
+            <div class="like-btn" data-post-id="${post.id}" data-liked="${post.user_liked ? '1' : '0'}">
+                <i class="like-icon ${likeIcon} fa-heart" ${likeMargin}></i>
+                <div class="likes">${likeDisplay}</div>
+            </div>
+            <div class="comment-btn" data-post-id="${post.id}">
+                <i class="comment-icon fa-regular fa-comment" ${commMargin}></i>
+                <div class="comments">${commDisplay}</div>
+            </div>
+            <div class="share-btn">
+                <i class="share-icon fa-regular fa-share-from-square" style="margin:0"></i>
+                <div class="shares"></div>
+            </div>
             ${trashBtn}
         </div>
+        <div class="comment-section"></div>
+    `;
         <div class="post-content">
             <div class="text">${escapeHtml(post.body)}</div>
             ${imageHtml}
@@ -169,8 +189,25 @@ function buildCommentRow(comment, postId, depth, showMore, showLess, excludeId) 
                     <div class="username">${escapeHtml(comment.display_name || comment.username)}</div>
                     <div class="timestamp">${escapeHtml(comment.timestamp_formatted)}</div>
                 </div>
+            </div>
+            <div class="comment-content">
+                <div class="text">${escapeHtml(comment.body)}</div>
+            </div>
+            <div class="comment-footer">
+                <div class="like-btn comment-like-btn" data-comment-id="${comment.id}" data-liked="0">
+                    <i class="like-icon fa-regular fa-heart" ${likeMargin}></i>
+                    <div class="likes">${likeDisplay}</div>
+                </div>
+                <div class="comment-btn comment-reply-btn" data-post-id="${postId}" data-comment-id="${comment.id}" data-depth="${depth}">
+                    <i class="comment-icon fa-regular fa-comment" ${replyMargin}></i>
+                    <div class="comments">${replyDisplay}</div>
+                </div>
+                ${showMoreBtn}
+                ${showLessBtn}
                 ${trashBtn}
             </div>
+        </div>
+    `;
             <div class="comment-content">
                 <div class="text">${escapeHtml(comment.body)}</div>
             </div>
@@ -192,8 +229,15 @@ function buildCommentRow(comment, postId, depth, showMore, showLess, excludeId) 
 }
 
 // ── Build compose box ─────────────────────────────────────────────────────────
-function buildComposeBox(postId, parentId, depth) {
+// buildComposeBox — parentUsername is the display name of who's being replied to
+function buildComposeBox(postId, parentId, depth, parentUsername) {
     const username    = currentUser ? currentUser.username : 'Guest';
+    const avatar      = (currentUser && currentUser.avatar_path)
+        ? '/' + currentUser.avatar_path
+        : 'assets/images/profile_picture.jpg';
+    const replyingTo  = parentUsername
+        ? `Replying to @${escapeHtml(parentUsername)}...`
+        : 'Replying to post...';
     const visualDepth = Math.min(depth, MAX_VISUAL_DEPTH);
     const bars        = '<div class="reply-bar"></div>'.repeat(visualDepth);
 
@@ -207,10 +251,10 @@ function buildComposeBox(postId, parentId, depth) {
         <div class="comment-body-wrap">
             <div class="reply-draft">
                 <div class="reply-draft-header">
-                    <img class="profile-picture" src="assets/images/profile_picture.jpg" alt="Profile Picture">
+                    <img class="profile-picture" src="${avatar}" alt="Profile Picture">
                     <div class="draft-details">
                         <div class="username">${escapeHtml(username)}</div>
-                        <div class="timestamp">Replying...</div>
+                        <div class="timestamp">${replyingTo}</div>
                     </div>
                 </div>
                 <div class="reply-draft-content">
@@ -355,9 +399,9 @@ function handlePostCommentBtn(btn) {
     toggleIcon(btn);
 
     if (!section.querySelector('.comment-row:not(.compose-box)')) {
-        loadCommentsIntoSection(postId, section, btn, true);
+        loadCommentsIntoSection(postId, section, btn, true, null);
     } else {
-        const compose = buildComposeBox(postId, null, 1);
+        const compose = buildComposeBox(postId, null, 1, null);
         section.insertBefore(compose, section.firstChild);
         compose.querySelector('.reply-text-input').focus();
     }
@@ -382,13 +426,16 @@ function handleCommentReplyBtn(btn) {
     closeAllComposeBoxes(null);
     toggleIcon(btn);
 
-    const compose = buildComposeBox(postId, commentId, depth);
+    // Get the username from the comment row's header
+    const replyToUsername = commentRow.querySelector('.comment-details .username')?.textContent?.trim() || null;
+
+    const compose = buildComposeBox(postId, commentId, depth, replyToUsername);
     commentRow.insertAdjacentElement('afterend', compose);
     compose.querySelector('.reply-text-input').focus();
 }
 
 // ── Load full comment tree into section ───────────────────────────────────────
-async function loadCommentsIntoSection(postId, section, triggerBtn, insertComposeAtTop) {
+async function loadCommentsIntoSection(postId, section, triggerBtn, insertComposeAtTop, parentUsername) {
     section.innerHTML = '<div class="feed-loading" style="padding:0.75rem 1rem">Loading comments...</div>';
 
     const res      = await fetch(`/api/get_comments.php?post_id=${postId}`);
@@ -402,7 +449,7 @@ async function loadCommentsIntoSection(postId, section, triggerBtn, insertCompos
     }
 
     if (triggerBtn) {
-        const compose = buildComposeBox(postId, null, 1);
+        const compose = buildComposeBox(postId, null, 1, parentUsername);
         if (insertComposeAtTop) {
             section.insertBefore(compose, section.firstChild);
         } else {

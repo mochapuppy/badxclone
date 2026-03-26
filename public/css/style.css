@@ -1602,3 +1602,48 @@ textarea {
     letter-spacing: 0.03em;
     text-transform: lowercase;
 }
+
+/* ── Delete button refinements ──────────────────────────────── */
+
+/* Override previous delete-btn styles — now lives in footer */
+.delete-btn {
+    margin-left: auto;
+    background-color: #333;
+    border: none;
+    color: #aaa;
+    font-size: 1rem;
+    padding: 0.4rem 0.5rem;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    transition: color 0.15s ease, background-color 0.15s ease;
+    display: flex;
+    align-items: center;
+    user-select: none;
+    flex-shrink: 0;
+}
+
+.delete-btn:hover {
+    color: #fff;
+    background-color: #e84040;
+}
+
+/* Post footer needs space-between so trash snaps right */
+.post-footer {
+    display: flex;
+    align-items: center;
+    padding: 0 1rem 1rem 1rem;
+    gap: 0.5rem;
+}
+
+/* Comment footer trash always after show more/less via order */
+.comment-footer {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.comment-footer .delete-btn {
+    margin-left: auto;
+    order: 99;
+}
