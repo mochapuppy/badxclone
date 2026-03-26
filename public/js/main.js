@@ -345,7 +345,7 @@ function untoggleIcon(element) {
 
 // ── Post comment button ───────────────────────────────────────────────────────
 function handlePostCommentBtn(btn) {
-    if (!currentUser) { window.location.href = '/login.html'; return; }
+    if (!currentUser) { window.location.href = '/login'; return; }
 
     const postCard = btn.closest('.post');
     const postId   = btn.dataset.postId;
@@ -374,7 +374,7 @@ function handlePostCommentBtn(btn) {
 
 // ── Comment reply button ──────────────────────────────────────────────────────
 function handleCommentReplyBtn(btn) {
-    if (!currentUser) { window.location.href = '/login.html'; return; }
+    if (!currentUser) { window.location.href = '/login'; return; }
 
     const postId     = btn.dataset.postId;
     const commentId  = btn.dataset.commentId;
@@ -543,7 +543,7 @@ async function submitComment(postId, parentId, textarea, composeRow) {
     if (parentId) formData.append('parent_id', parentId);
 
     const res = await fetch('/api/create_comment.php', { method: 'POST', body: formData });
-    if (res.status === 401) { window.location.href = '/login.html'; return; }
+    if (res.status === 401) { window.location.href = '/login'; return; }
 
     const comment = await res.json();
 
@@ -584,7 +584,7 @@ async function submitComment(postId, parentId, textarea, composeRow) {
 
 // ── Post like ─────────────────────────────────────────────────────────────────
 async function handlePostLike(btn) {
-    if (!currentUser) { window.location.href = '/login.html'; return; }
+    if (!currentUser) { window.location.href = '/login'; return; }
 
     const postId   = btn.dataset.postId;
     const icon     = btn.querySelector('.like-icon');
@@ -599,7 +599,7 @@ async function handlePostLike(btn) {
     formData.append('post_id', postId);
 
     const res  = await fetch('/api/toggle_like.php', { method: 'POST', body: formData });
-    if (res.status === 401) { window.location.href = '/login.html'; return; }
+    if (res.status === 401) { window.location.href = '/login'; return; }
 
     const data = await res.json();
     if (data.error) {
@@ -615,7 +615,7 @@ async function handlePostLike(btn) {
 
 // ── Comment like ──────────────────────────────────────────────────────────────
 async function handleCommentLike(btn) {
-    if (!currentUser) { window.location.href = '/login.html'; return; }
+    if (!currentUser) { window.location.href = '/login'; return; }
 
     const commentId = btn.dataset.commentId;
     const icon      = btn.querySelector('.like-icon');
@@ -630,7 +630,7 @@ async function handleCommentLike(btn) {
     formData.append('comment_id', commentId);
 
     const res  = await fetch('/api/toggle_comment_like.php', { method: 'POST', body: formData });
-    if (res.status === 401) { window.location.href = '/login.html'; return; }
+    if (res.status === 401) { window.location.href = '/login'; return; }
 
     const data = await res.json();
     if (data.error) {
@@ -646,7 +646,7 @@ async function handleCommentLike(btn) {
 
 // ── Post modal ────────────────────────────────────────────────────────────────
 function openPostModal() {
-    if (!currentUser) { window.location.href = '/login.html'; return; }
+    if (!currentUser) { window.location.href = '/login'; return; }
 
     const existing = document.getElementById('post-modal-overlay');
     if (existing) existing.remove();
@@ -722,7 +722,7 @@ async function submitPost(overlay) {
     if (imageInput.files[0]) formData.append('image', imageInput.files[0]);
 
     const res = await fetch('/api/create_post.php', { method: 'POST', body: formData });
-    if (res.status === 401) { window.location.href = '/login.html'; return; }
+    if (res.status === 401) { window.location.href = '/login'; return; }
 
     const post = await res.json();
     if (post.error) {

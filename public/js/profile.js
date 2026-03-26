@@ -49,7 +49,7 @@
             formData.append('user_id', userId);
 
             const res = await fetch('/api/toggle_follow.php', { method: 'POST', body: formData });
-            if (res.status === 401) { window.location.href = '/login.html'; return; }
+            if (res.status === 401) { window.location.href = '/login'; return; }
 
             const data = await res.json();
             if (data.error) return;
