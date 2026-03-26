@@ -1683,3 +1683,92 @@ textarea {
     margin-left: auto;
     order: 99;
 }
+
+/* ── Footer layout — definitive fix ────────────────────────── */
+
+/* Post footer */
+.post-footer {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem 1rem 1rem 1rem;
+    gap: 0.5rem;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* Left-side buttons sit naturally with gap */
+.post-footer .like-btn,
+.post-footer .comment-btn,
+.post-footer .share-btn {
+    margin-left: 0;
+    flex-shrink: 0;
+}
+
+/* Delete on post footer snaps to far right */
+.post-footer .delete-btn {
+    margin-left: auto;
+    flex-shrink: 0;
+}
+
+/* Comment footer */
+.comment-footer {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding-bottom: 0.75rem;
+    width: 100%;
+    box-sizing: border-box;
+    flex-wrap: nowrap;
+}
+
+/* Like and reply buttons — left side, natural flow */
+.comment-footer .comment-like-btn,
+.comment-footer .comment-reply-btn {
+    margin-left: 0;
+    flex-shrink: 0;
+}
+
+/* Show more/less — pushed to right, sits just left of delete */
+.comment-footer .show-more-btn,
+.comment-footer .show-less-btn {
+    margin-left: auto;
+    flex-shrink: 0;
+    order: 10;
+}
+
+/* Delete — always last on far right, same gap as between other buttons */
+.comment-footer .delete-btn {
+    margin-left: 0;
+    flex-shrink: 0;
+    order: 11;
+}
+
+/* When there's no show more/less, delete still snaps right */
+.comment-footer .delete-btn:first-of-type:last-of-type,
+.comment-footer .like-btn ~ .delete-btn:not(.show-more-btn ~ .delete-btn) {
+    margin-left: auto;
+}
+
+/* Simpler approach — delete always auto unless show-more is present */
+.comment-footer:not(:has(.show-more-btn)):not(:has(.show-less-btn)) .delete-btn {
+    margin-left: auto;
+}
+
+/* ── Comment footer right group ─────────────────────────────── */
+
+/* Right-side group pushed to far right with auto margin */
+.comment-footer-right {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-shrink: 0;
+}
+
+/* Items inside right group have no extra margin */
+.comment-footer-right .show-more-btn,
+.comment-footer-right .show-less-btn,
+.comment-footer-right .delete-btn {
+    margin-left: 0;
+    order: unset;
+}

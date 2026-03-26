@@ -155,6 +155,10 @@ function buildCommentRow(comment, postId, depth, showMore, showLess, excludeId) 
            </div>`
         : '';
 
+    const rightGroup = (showMoreBtn || showLessBtn || trashBtn)
+        ? `<div class="comment-footer-right">${showMoreBtn}${showLessBtn}${trashBtn}</div>`
+        : '';
+
     const row = document.createElement('div');
     row.className         = 'comment-row';
     row.dataset.commentId = comment.id;
@@ -182,9 +186,7 @@ function buildCommentRow(comment, postId, depth, showMore, showLess, excludeId) 
                     <i class="comment-icon fa-regular fa-comment" ${replyMargin}></i>
                     <div class="comments">${replyDisplay}</div>
                 </div>
-                ${showMoreBtn}
-                ${showLessBtn}
-                ${trashBtn}
+                ${rightGroup}
             </div>
         </div>
     `;
@@ -460,23 +462,35 @@ async function handleShowMore(btn) {
 
 // ── Add show less button to last comment in section ───────────────────────────
 function addShowLessToLastComment(section, postId) {
-    // Find last comment-row that's not a compose box
-    const allRows   = [...section.querySelectorAll('.comment-row:not(.compose-box)')];
-    const lastRow   = allRows[allRows.length - 1];
+    const allRows = [...section.querySelectorAll('.comment-row:not(.compose-box)')];
+    const lastRow = allRows[allRows.length - 1];
     if (!lastRow) return;
 
     const footer = lastRow.querySelector('.comment-footer');
     if (!footer) return;
 
-    // Don't add if already there
     if (footer.querySelector('.show-less-btn')) return;
 
     const btn = document.createElement('div');
-    btn.className        = 'show-less-btn';
-    btn.dataset.postId   = postId;
-    btn.innerHTML        = `<i class="fa-solid fa-chevron-up"></i> Show less`;
+    btn.className      = 'show-less-btn';
+    btn.dataset.postId = postId;
+    btn.innerHTML      = `<i class="fa-solid fa-chevron-up"></i> Show less`;
     btn.addEventListener('click', () => handleShowLess(btn));
-    footer.appendChild(btn);
+
+    // Insert into right group if it exists, otherwise create one
+    let rightGroup = footer.querySelector('.comment-footer-right');
+    if (!rightGroup) {
+        rightGroup = document.createElement('div');
+        rightGroup.className = 'comment-footer-right';
+        footer.appendChild(rightGroup);
+    }
+    // Prepend before delete button if present
+    const deleteBtn = rightGroup.querySelector('.delete-btn');
+    if (deleteBtn) {
+        rightGroup.insertBefore(btn, deleteBtn);
+    } else {
+        rightGroup.appendChild(btn);
+    }
 }
 
 // ── Show less ─────────────────────────────────────────────────────────────────
