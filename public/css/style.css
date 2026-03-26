@@ -178,6 +178,8 @@ html, body {
     width: 100%;
 }
 
+/* post-footer gets its own tighter rule — see definitive rule at bottom of file */
+
 .post-details, .comment-details, .draft-details {
     margin: 0 0 0 0.75rem;
     display: flex;
@@ -1728,13 +1730,19 @@ textarea {
 .post-footer {
     display: flex;
     align-items: center;
-    padding: 0.5rem 1rem 0.6rem 1rem;
+    padding: 0.4rem 1rem 0.6rem 1rem;
     gap: 0.5rem;
     width: 100%;
     box-sizing: border-box;
+    height: auto;
 }
 
 .post-footer .delete-btn {
     margin-left: auto;
     flex-shrink: 0;
+}
+
+/* Tighten post content bottom padding so footer sits closer to text */
+.post > .post-content {
+    padding-bottom: 0.4rem;
 }
