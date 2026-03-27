@@ -1,6 +1,6 @@
 // main.js
 
-const MAX_VISUAL_DEPTH = 4;
+const MAX_VISUAL_DEPTH = Infinity;
 
 // ── Auth state ────────────────────────────────────────────────────────────────
 let currentUser = null;
