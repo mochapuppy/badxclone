@@ -1755,3 +1755,15 @@ textarea {
 .comment-footer .comment-reply-btn {
     margin-right: 0;
 }
+
+/* ── Post bottom spacing fix ────────────────────────────────── */
+
+/* Empty comment section adds no space */
+.comment-section:empty {
+    display: none;
+}
+
+/* Match bottom padding to left padding (1rem) for visual consistency */
+.post-footer {
+    padding-bottom: 1rem;
+}
