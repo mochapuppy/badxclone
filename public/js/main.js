@@ -130,6 +130,7 @@ function renderCommentTree(comments, container, postId, depth, hasMore, excludeI
 // showLess = show "show less" button on this row's footer
 function buildCommentRow(comment, postId, depth, showMore, showLess, excludeId) {
     const avatar       = comment.avatar_path ? `/${comment.avatar_path}` : 'assets/images/profile_picture.jpg';
+    const likeIcon    = comment.user_liked ? 'fa-solid' : 'fa-regular';
     const likeDisplay  = comment.like_count  > 0 ? comment.like_count  : '';
     const replyDisplay = comment.reply_count > 0 ? comment.reply_count : '';
     const likeMargin   = comment.like_count  > 0 ? '' : 'style="margin:0"';
@@ -178,8 +179,8 @@ function buildCommentRow(comment, postId, depth, showMore, showLess, excludeId) 
                 <div class="text">${escapeHtml(comment.body)}</div>
             </div>
             <div class="comment-footer">
-                <div class="like-btn comment-like-btn" data-comment-id="${comment.id}" data-liked="0">
-                    <i class="like-icon fa-regular fa-heart" ${likeMargin}></i>
+                <div class="like-btn comment-like-btn" data-comment-id="${comment.id}" data-liked="${comment.user_liked ? '1' : '0'}">
+                    <i class="like-icon ${likeIcon} fa-heart" ${likeMargin}></i>
                     <div class="likes">${likeDisplay}</div>
                 </div>
                 <div class="comment-btn comment-reply-btn" data-post-id="${postId}" data-comment-id="${comment.id}" data-depth="${depth}">
